@@ -374,17 +374,29 @@
     }
   }
 
-  function getCurrentPosition() {
+  const GEO_TIMEOUT_MS = 5500;
+
+  function getCurrentPosition(timeoutMs = GEO_TIMEOUT_MS) {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error("Geolocation not available"));
         return;
       }
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: false,
-        timeout: 12000,
-        maximumAge: 300000,
+      const nativeTimeout = Math.max(timeoutMs, 1000);
+      const geoPromise = new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(res, rej, {
+          enableHighAccuracy: false,
+          timeout: nativeTimeout,
+          maximumAge: 300000,
+        });
       });
+      const timer = new Promise((_, rej) => {
+        setTimeout(
+          () => rej(new Error("Location request timed out")),
+          timeoutMs
+        );
+      });
+      Promise.race([geoPromise, timer]).then(resolve, reject);
     });
   }
 
@@ -434,16 +446,36 @@
   }
 
   async function coldStart() {
-    setStatus("Finding your location…");
+    // Paint cached forecast immediately so the UI never sits blank on geo.
+    const cached = readCache();
+    let showedCache = false;
+    if (cached?.data && cached?.place) {
+      render(cached.data, cached.place, { cached: true });
+      showedCache = true;
+      setStatus("Updating from your location…");
+    } else {
+      setStatus("Finding your location…");
+    }
+
     try {
       await loadNearMe();
       return;
     } catch {
       /* permission denied / timeout / unavailable */
     }
+
     const saved = loadPlace();
     if (saved) {
-      await load(saved);
+      // If we already showed this place from cache, refresh quietly; else load.
+      if (showedCache && cached?.place && samePlace(saved, cached.place)) {
+        await load(saved, { quiet: true });
+      } else {
+        await load(saved);
+      }
+      return;
+    }
+    if (showedCache) {
+      await load(cached.place, { quiet: true });
       return;
     }
     await load(DEFAULT);
@@ -527,7 +559,11 @@
     try {
       await loadNearMe();
     } catch (err) {
-      setStatus(err.message || "Location permission denied.", "error");
+      const msg =
+        err && err.code === 1
+          ? "Location permission denied."
+          : err?.message || "Could not get your location.";
+      setStatus(msg, "error");
     } finally {
       els.geoBtn.disabled = false;
     }
