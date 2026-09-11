@@ -28,7 +28,12 @@
         <h1 class="site-title">Weather</h1>
       </div>
     </div>
-    <p class="credit">Data by <a href="https://open-meteo.com/" rel="noopener noreferrer" target="_blank">Open-Meteo</a></p>
+    <div class="header-actions">
+      <button type="button" id="install-btn" class="btn btn-install" hidden>
+        Add to Home Screen
+      </button>
+      <p class="credit">Data by <a href="https://open-meteo.com/" rel="noopener noreferrer" target="_blank">Open-Meteo</a></p>
+    </div>
   </header>
 
   <main id="main" class="main">
@@ -51,14 +56,31 @@
         Near me
       </button>
       <ul id="search-results" class="search-results" role="listbox" hidden></ul>
+      <div id="favorites" class="favorites" hidden>
+        <p class="favorites-label">Favorites</p>
+        <ul id="favorites-list" class="favorites-list" aria-label="Saved cities"></ul>
+      </div>
     </section>
 
-    <p id="status" class="status" role="status" aria-live="polite">Loading Springfield, MA…</p>
+    <div id="ios-install-hint" class="ios-install-hint" hidden>
+      <p><strong>Install on iPhone / iPad</strong></p>
+      <ol>
+        <li>Tap the <strong>Share</strong> button in Safari</li>
+        <li>Scroll and tap <strong>Add to Home Screen</strong></li>
+        <li>Tap <strong>Add</strong></li>
+      </ol>
+      <button type="button" id="ios-hint-dismiss" class="btn btn-ghost">Got it</button>
+    </div>
+
+    <p id="status" class="status" role="status" aria-live="polite">Finding your location…</p>
 
     <section id="current" class="current card" aria-labelledby="place-name" hidden>
       <div class="current-top">
         <div>
-          <h2 id="place-name" class="place-name">—</h2>
+          <div class="place-row">
+            <h2 id="place-name" class="place-name">—</h2>
+            <button type="button" id="fav-btn" class="btn-fav" aria-label="Save favorite" title="Save favorite">★ Save</button>
+          </div>
           <p id="updated" class="meta">—</p>
         </div>
         <div class="temp-block">

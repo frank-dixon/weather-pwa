@@ -1,6 +1,6 @@
 /* Weather PWA service worker — app shell + last forecast API cache */
-const SHELL_CACHE = "weather-pwa-shell-v1";
-const DATA_CACHE = "weather-pwa-data-v1";
+const SHELL_CACHE = "weather-pwa-shell-v2";
+const DATA_CACHE = "weather-pwa-data-v2";
 
 const SHELL_ASSETS = [
   "./",

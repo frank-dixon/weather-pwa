@@ -400,3 +400,138 @@ h2 { font-size: 1.25rem; }
   body { padding-left: 1.5rem; padding-right: 1.5rem; }
   .stats dd { font-size: 1.1rem; }
 }
+
+/* ——— Favorites & install ——— */
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.btn-install {
+  background: var(--espresso);
+  color: var(--on-teal);
+  font-size: 0.82rem;
+  padding: 0.45rem 0.85rem;
+  box-shadow: 0 6px 16px rgba(36, 30, 27, 0.18);
+}
+.btn-install:hover:not(:disabled) {
+  background: #3a322e;
+}
+.btn-install.is-installed {
+  background: rgba(255, 253, 248, 0.72);
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  box-shadow: none;
+  cursor: default;
+}
+
+.place-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.65rem;
+}
+
+.btn-fav {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid var(--rule);
+  background: rgba(255, 253, 248, 0.9);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-fav:hover { background: var(--paper-2); }
+.btn-fav.is-saved {
+  background: rgba(11, 138, 143, 0.12);
+  border-color: rgba(11, 138, 143, 0.35);
+  color: var(--teal-deep);
+}
+
+.favorites {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.favorites-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.favorites-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.fav-chip {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 253, 248, 0.85);
+}
+
+.fav-chip.is-active {
+  border-color: rgba(11, 138, 143, 0.45);
+  background: rgba(11, 138, 143, 0.1);
+}
+
+.fav-load,
+.fav-remove {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  padding: 0.35rem 0.65rem;
+}
+
+.fav-remove {
+  border-left: 1px solid var(--rule);
+  color: var(--muted);
+  padding-left: 0.5rem;
+  padding-right: 0.55rem;
+  line-height: 1;
+}
+
+.fav-load:hover,
+.fav-remove:hover {
+  background: var(--paper-2);
+}
+
+.ios-install-hint {
+  background: rgba(255, 253, 248, 0.9);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.ios-install-hint ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--ink-soft);
+  display: grid;
+  gap: 0.25rem;
+}
+
+.ios-install-hint .btn {
+  justify-self: start;
+}

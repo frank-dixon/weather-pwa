@@ -10,6 +10,7 @@
 
   const CACHE_KEY = "weather-pwa:last-forecast";
   const PLACE_KEY = "weather-pwa:place";
+  const FAV_KEY = "weather-pwa:favorites";
 
   const WMO = {
     0: "Clear",
@@ -61,9 +62,16 @@
     input: document.getElementById("city-input"),
     results: document.getElementById("search-results"),
     geoBtn: document.getElementById("geo-btn"),
+    favBtn: document.getElementById("fav-btn"),
+    favorites: document.getElementById("favorites"),
+    favoritesList: document.getElementById("favorites-list"),
+    installBtn: document.getElementById("install-btn"),
+    iosHint: document.getElementById("ios-install-hint"),
+    iosDismiss: document.getElementById("ios-hint-dismiss"),
   };
 
-  let place = loadPlace() || DEFAULT;
+  let place = DEFAULT;
+  let deferredPrompt = null;
 
   function loadPlace() {
     try {
@@ -80,6 +88,98 @@
     } catch {
       /* ignore */
     }
+  }
+
+  function roundCoord(n) {
+    return Math.round(Number(n) * 100) / 100;
+  }
+
+  function samePlace(a, b) {
+    return (
+      roundCoord(a.latitude) === roundCoord(b.latitude) &&
+      roundCoord(a.longitude) === roundCoord(b.longitude)
+    );
+  }
+
+  function loadFavorites() {
+    try {
+      const raw = localStorage.getItem(FAV_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveFavorites(list) {
+    try {
+      localStorage.setItem(FAV_KEY, JSON.stringify(list));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function isFavorite(p) {
+    return loadFavorites().some((f) => samePlace(f, p));
+  }
+
+  function addFavorite(p) {
+    const list = loadFavorites().filter((f) => !samePlace(f, p));
+    list.unshift({
+      name: p.name,
+      latitude: p.latitude,
+      longitude: p.longitude,
+      timezone: p.timezone || "America/New_York",
+    });
+    saveFavorites(list);
+    renderFavorites();
+    updateFavBtn();
+  }
+
+  function removeFavorite(p) {
+    saveFavorites(loadFavorites().filter((f) => !samePlace(f, p)));
+    renderFavorites();
+    updateFavBtn();
+  }
+
+  function updateFavBtn() {
+    if (!els.favBtn || !place) return;
+    const saved = isFavorite(place);
+    els.favBtn.classList.toggle("is-saved", saved);
+    els.favBtn.setAttribute(
+      "aria-label",
+      saved ? "Remove favorite" : "Save favorite"
+    );
+    els.favBtn.title = saved ? "Remove favorite" : "Save favorite";
+    els.favBtn.textContent = saved ? "★ Saved" : "★ Save";
+  }
+
+  function renderFavorites() {
+    const list = loadFavorites();
+    if (!list.length) {
+      els.favorites.hidden = true;
+      els.favoritesList.innerHTML = "";
+      return;
+    }
+    els.favorites.hidden = false;
+    els.favoritesList.innerHTML = list
+      .map((f, i) => {
+        const active = samePlace(f, place) ? " is-active" : "";
+        const label = escapeHtml(f.name);
+        return `<li class="fav-chip${active}">
+          <button type="button" class="fav-load" data-i="${i}">${label}</button>
+          <button type="button" class="fav-remove" data-i="${i}" aria-label="Remove ${label}">×</button>
+        </li>`;
+      })
+      .join("");
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
   function weatherLabel(code) {
@@ -243,6 +343,8 @@
     els.current.hidden = false;
     els.hourlySection.hidden = false;
     els.dailySection.hidden = false;
+    updateFavBtn();
+    renderFavorites();
     setStatus(
       cached ? "Showing last saved forecast (offline or fetch failed)." : "",
       cached ? "cached" : ""
@@ -271,6 +373,81 @@
         els.dailySection.hidden = true;
       }
     }
+  }
+
+  function getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation not available"));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: false,
+        timeout: 12000,
+        maximumAge: 300000,
+      });
+    });
+  }
+
+  async function placeFromCoords(latitude, longitude) {
+    const base = {
+      name: "Near me",
+      latitude,
+      longitude,
+      timezone: "auto",
+    };
+    try {
+      const data = await fetchForecast(base);
+      const tz = data.timezone || "auto";
+      const label =
+        tz && tz !== "auto"
+          ? `Near me · ${tz.replace(/_/g, " ")}`
+          : "Near me";
+      return {
+        name: label,
+        latitude,
+        longitude,
+        timezone: tz,
+        _forecast: data,
+      };
+    } catch {
+      return base;
+    }
+  }
+
+  async function loadNearMe() {
+    const pos = await getCurrentPosition();
+    const { latitude, longitude } = pos.coords;
+    const next = await placeFromCoords(latitude, longitude);
+    if (next._forecast) {
+      const data = next._forecast;
+      delete next._forecast;
+      const refined = {
+        ...next,
+        timezone: data.timezone || next.timezone || "America/New_York",
+      };
+      cacheForecast(refined, data);
+      savePlace(refined);
+      render(data, refined);
+    } else {
+      await load(next);
+    }
+  }
+
+  async function coldStart() {
+    setStatus("Finding your location…");
+    try {
+      await loadNearMe();
+      return;
+    } catch {
+      /* permission denied / timeout / unavailable */
+    }
+    const saved = loadPlace();
+    if (saved) {
+      await load(saved);
+      return;
+    }
+    await load(DEFAULT);
   }
 
   async function searchCities(q) {
@@ -345,45 +522,121 @@
     }
   });
 
-  els.geoBtn.addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      setStatus("Geolocation not available on this device.", "error");
-      return;
-    }
+  els.geoBtn.addEventListener("click", async () => {
     els.geoBtn.disabled = true;
     setStatus("Getting your location…");
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        try {
-          await load({
-            name: "Near me",
-            latitude,
-            longitude,
-            timezone: "auto",
-          });
-          const cached = readCache();
-          if (cached?.data?.timezone) {
-            const refined = {
-              name: `Near me · ${cached.data.timezone.replace(/_/g, " ")}`,
-              latitude,
-              longitude,
-              timezone: cached.data.timezone,
-            };
-            savePlace(refined);
-            els.place.textContent = refined.name;
-            place = refined;
-          }
-        } finally {
-          els.geoBtn.disabled = false;
-        }
-      },
-      (err) => {
-        els.geoBtn.disabled = false;
-        setStatus(err.message || "Location permission denied.", "error");
-      },
-      { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 }
+    try {
+      await loadNearMe();
+    } catch (err) {
+      setStatus(err.message || "Location permission denied.", "error");
+    } finally {
+      els.geoBtn.disabled = false;
+    }
+  });
+
+  els.favBtn.addEventListener("click", () => {
+    if (!place || place.latitude == null) return;
+    if (isFavorite(place)) {
+      removeFavorite(place);
+    } else {
+      addFavorite(place);
+    }
+  });
+
+  els.favoritesList.addEventListener("click", (e) => {
+    const removeBtn = e.target.closest(".fav-remove");
+    const loadBtn = e.target.closest(".fav-load");
+    if (removeBtn) {
+      const f = loadFavorites()[Number(removeBtn.dataset.i)];
+      if (f) removeFavorite(f);
+      return;
+    }
+    if (loadBtn) {
+      const f = loadFavorites()[Number(loadBtn.dataset.i)];
+      if (f) load(f);
+    }
+  });
+
+  /* ——— Install / Add to Home Screen ——— */
+  function isStandalone() {
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      window.matchMedia("(display-mode: minimal-ui)").matches ||
+      navigator.standalone === true
     );
+  }
+
+  function isIos() {
+    const ua = navigator.userAgent || "";
+    return /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+
+  function isSafari() {
+    const ua = navigator.userAgent || "";
+    return /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|Chrome|Android/.test(ua);
+  }
+
+  function setInstallUI() {
+    if (!els.installBtn) return;
+    if (isStandalone()) {
+      els.installBtn.hidden = false;
+      els.installBtn.disabled = true;
+      els.installBtn.textContent = "Installed";
+      els.installBtn.classList.add("is-installed");
+      els.iosHint.hidden = true;
+      return;
+    }
+    els.installBtn.classList.remove("is-installed");
+    els.installBtn.disabled = false;
+    if (deferredPrompt) {
+      els.installBtn.hidden = false;
+      els.installBtn.textContent = "Add to Home Screen";
+      return;
+    }
+    if (isIos() && isSafari()) {
+      els.installBtn.hidden = false;
+      els.installBtn.textContent = "Add to Home Screen";
+      return;
+    }
+    // Chrome/Edge may fire beforeinstallprompt later — keep a subtle Install affordance
+    // only when we already know install is possible, or on iOS. Otherwise hide until prompt.
+    els.installBtn.hidden = true;
+  }
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setInstallUI();
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredPrompt = null;
+    setInstallUI();
+  });
+
+  els.installBtn.addEventListener("click", async () => {
+    if (isStandalone()) return;
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      try {
+        await deferredPrompt.userChoice;
+      } catch {
+        /* ignore */
+      }
+      deferredPrompt = null;
+      setInstallUI();
+      return;
+    }
+    if (isIos()) {
+      els.iosHint.hidden = false;
+      els.iosHint.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  });
+
+  els.iosDismiss.addEventListener("click", () => {
+    els.iosHint.hidden = true;
   });
 
   if ("serviceWorker" in navigator) {
@@ -394,5 +647,7 @@
     });
   }
 
-  load(place);
+  renderFavorites();
+  setInstallUI();
+  coldStart();
 })();
