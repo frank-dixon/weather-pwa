@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Weather">
+  <circle cx="256" cy="256" r="246" fill="#F3EEE4"/>
+  <circle cx="215" cy="225" r="72" fill="#0B8A8F"/>
+  <g stroke="#0B8A8F" stroke-width="18" stroke-linecap="round">
+    <line x1="215" y1="110" x2="215" y2="145"/>
+    <line x1="215" y1="305" x2="215" y2="340"/>
+    <line x1="100" y1="225" x2="135" y2="225"/>
+    <line x1="295" y1="225" x2="330" y2="225"/>
+    <line x1="134" y1="144" x2="158" y2="168"/>
+    <line x1="272" y1="282" x2="296" y2="306"/>
+    <line x1="134" y1="306" x2="158" y2="282"/>
+    <line x1="272" y1="168" x2="296" y2="144"/>
+  </g>
+  <ellipse cx="230" cy="330" rx="70" ry="48" fill="#1C1C1A"/>
+  <ellipse cx="290" cy="318" rx="78" ry="55" fill="#1C1C1A"/>
+  <ellipse cx="350" cy="338" rx="55" ry="40" fill="#1C1C1A"/>
+  <ellipse cx="270" cy="355" rx="95" ry="42" fill="#1C1C1A"/>
+</svg>
