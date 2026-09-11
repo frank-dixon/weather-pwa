@@ -29,9 +29,6 @@
       </div>
     </div>
     <div class="header-actions">
-      <button type="button" id="install-btn" class="btn btn-install" hidden>
-        Add to Home Screen
-      </button>
       <p class="credit">Data by <a href="https://open-meteo.com/" rel="noopener noreferrer" target="_blank">Open-Meteo</a></p>
     </div>
   </header>
@@ -61,16 +58,6 @@
         <ul id="favorites-list" class="favorites-list" aria-label="Saved cities"></ul>
       </div>
     </section>
-
-    <div id="ios-install-hint" class="ios-install-hint" hidden>
-      <p><strong>Install on iPhone / iPad</strong></p>
-      <ol>
-        <li>Tap the <strong>Share</strong> button in Safari</li>
-        <li>Scroll and tap <strong>Add to Home Screen</strong></li>
-        <li>Tap <strong>Add</strong></li>
-      </ol>
-      <button type="button" id="ios-hint-dismiss" class="btn btn-ghost">Got it</button>
-    </div>
 
     <p id="status" class="status" role="status" aria-live="polite">Finding your location…</p>
 
@@ -126,6 +113,20 @@
 
   <footer class="site-footer">
     <p>Offline-ready shell · Last forecast cached for quiet moments.</p>
+    <details id="install-details" class="install-details">
+      <summary>Add to Home Screen</summary>
+      <div class="install-body">
+        <p class="install-lead">Save this weather app as an icon on your phone.</p>
+        <ol>
+          <li>Tap the <strong>Share</strong> button in Safari</li>
+          <li>Scroll and tap <strong>Add to Home Screen</strong></li>
+          <li>Tap <strong>Add</strong></li>
+        </ol>
+        <button type="button" id="install-btn" class="btn btn-install" hidden>
+          Install
+        </button>
+      </div>
+    </details>
   </footer>
 
   <script src="./app.js" defer></script>

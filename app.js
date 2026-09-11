@@ -66,8 +66,7 @@
     favorites: document.getElementById("favorites"),
     favoritesList: document.getElementById("favorites-list"),
     installBtn: document.getElementById("install-btn"),
-    iosHint: document.getElementById("ios-install-hint"),
-    iosDismiss: document.getElementById("ios-hint-dismiss"),
+    installDetails: document.getElementById("install-details"),
   };
 
   let place = DEFAULT;
@@ -557,7 +556,7 @@
     }
   });
 
-  /* ——— Install / Add to Home Screen ——— */
+  /* ——— Install / Add to Home Screen (footer details) ——— */
   function isStandalone() {
     return (
       window.matchMedia("(display-mode: standalone)").matches ||
@@ -567,41 +566,23 @@
     );
   }
 
-  function isIos() {
-    const ua = navigator.userAgent || "";
-    return /iPad|iPhone|iPod/.test(ua) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  }
-
-  function isSafari() {
-    const ua = navigator.userAgent || "";
-    return /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|Chrome|Android/.test(ua);
-  }
-
   function setInstallUI() {
     if (!els.installBtn) return;
     if (isStandalone()) {
-      els.installBtn.hidden = false;
+      els.installBtn.hidden = true;
       els.installBtn.disabled = true;
-      els.installBtn.textContent = "Installed";
-      els.installBtn.classList.add("is-installed");
-      els.iosHint.hidden = true;
+      els.installBtn.classList.remove("is-installed");
       return;
     }
-    els.installBtn.classList.remove("is-installed");
     els.installBtn.disabled = false;
+    els.installBtn.classList.remove("is-installed");
     if (deferredPrompt) {
       els.installBtn.hidden = false;
-      els.installBtn.textContent = "Add to Home Screen";
+      els.installBtn.textContent = "Install";
       return;
     }
-    if (isIos() && isSafari()) {
-      els.installBtn.hidden = false;
-      els.installBtn.textContent = "Add to Home Screen";
-      return;
-    }
-    // Chrome/Edge may fire beforeinstallprompt later — keep a subtle Install affordance
-    // only when we already know install is possible, or on iOS. Otherwise hide until prompt.
+    // No deferred prompt (typical iOS / unsupported) — hide Install button;
+    // Safari steps remain visible inside the footer details.
     els.installBtn.hidden = true;
   }
 
@@ -617,26 +598,15 @@
   });
 
   els.installBtn.addEventListener("click", async () => {
-    if (isStandalone()) return;
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      try {
-        await deferredPrompt.userChoice;
-      } catch {
-        /* ignore */
-      }
-      deferredPrompt = null;
-      setInstallUI();
-      return;
+    if (isStandalone() || !deferredPrompt) return;
+    deferredPrompt.prompt();
+    try {
+      await deferredPrompt.userChoice;
+    } catch {
+      /* ignore */
     }
-    if (isIos()) {
-      els.iosHint.hidden = false;
-      els.iosHint.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  });
-
-  els.iosDismiss.addEventListener("click", () => {
-    els.iosHint.hidden = true;
+    deferredPrompt = null;
+    setInstallUI();
   });
 
   if ("serviceWorker" in navigator) {
