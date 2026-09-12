@@ -39,7 +39,7 @@ body {
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   padding:
-    calc(1.25rem + var(--safe-top))
+    0
     1.1rem
     calc(2rem + var(--safe-bottom));
 }
@@ -66,7 +66,7 @@ input:focus-visible {
   text-decoration: none;
   font-weight: 600;
 }
-.skip-link:focus { top: calc(0.75rem + var(--safe-top)); }
+.skip-link:focus { top: calc(0.75rem + var(--safe-top)); z-index: 60; }
 
 .sr-only {
   position: absolute;
@@ -77,6 +77,72 @@ input:focus-visible {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   Hub masthead (shared portfolio chrome — absolute hub URLs)
+   -------------------------------------------------------------------------- */
+.hub-masthead {
+  margin-left: -1.1rem;
+  margin-right: -1.1rem;
+  margin-bottom: 1.15rem;
+  padding-top: var(--safe-top);
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.hub-nav {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0.85rem 1.1rem 0.8rem;
+}
+
+.hub-wordmark {
+  font-family: Fraunces, Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.hub-wordmark span {
+  color: var(--teal);
+}
+
+.hub-masthead nav ul {
+  list-style: none;
+  display: flex;
+  gap: 0.35rem 1.15rem;
+  flex-wrap: wrap;
+}
+
+.hub-masthead nav a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hub-masthead nav a:hover {
+  color: var(--ink);
+}
+
+.site-header {
+  margin-top: 0.15rem;
 }
 
 .site-header,
