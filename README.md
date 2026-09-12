@@ -47,7 +47,7 @@ All asset links use relative URLs (`./…`) so the project-pages base path works
 
 - Static files only (no bundler, React, or TypeScript)
 - Forecast + geocoding: Open-Meteo public APIs
-- Design: cream `#F3EEE4`, ink text, dark turquoise `#0B8A8F`
+- Design: Cool Spectrum dark — Space Grotesk / Inter / JetBrains Mono; `#0A0C10` `#E6EAF0` `#6B7FD7` `#5FA8A0`
 
 ## License
 
