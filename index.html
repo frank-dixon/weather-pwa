@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0A0C10" />
+  <meta name="theme-color" content="#F7F3EA" />
   <meta name="description" content="Local weather forecast for Springfield, MA and anywhere — installable PWA powered by Open-Meteo." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Weather" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
   <title>Weather</title>
 </head>
@@ -21,18 +21,19 @@
   <a class="skip-link" href="#main">Skip to forecast</a>
 
 
-  <header class="hub-masthead">
-    <div class="hub-nav">
-      <a class="hub-wordmark" href="https://frank-dixon.github.io/">Frank Dixon<span>.</span></a>
+  <header class="hub-masthead hs-lattice">
+    <div class="mx-auto flex min-h-[3.15rem] max-w-[42rem] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-[1.1rem] py-2">
+      <a class="hs-backlink text-muted hover:text-ink" href="https://frank-dixon.github.io/"><span aria-hidden="true">←</span> Frank Dixon</a>
       <nav aria-label="Frank Dixon site">
-        <ul>
-          <li><a href="https://frank-dixon.github.io/#about">About</a></li>
-          <li><a href="https://frank-dixon.github.io/#work">Work</a></li>
-          <li><a href="https://frank-dixon.github.io/#projects">Projects</a></li>
-          <li><a href="https://frank-dixon.github.io/#contact">Contact</a></li>
+        <ul class="m-0 flex list-none flex-wrap gap-x-5 gap-y-1 p-0">
+          <li><a class="font-mono text-[0.68rem] font-medium uppercase tracking-[0.12em] text-muted no-underline transition-colors hover:text-ink" href="https://frank-dixon.github.io/#about">About</a></li>
+          <li><a class="font-mono text-[0.68rem] font-medium uppercase tracking-[0.12em] text-muted no-underline transition-colors hover:text-ink" href="https://frank-dixon.github.io/#work">Work</a></li>
+          <li><a class="font-mono text-[0.68rem] font-medium uppercase tracking-[0.12em] text-muted no-underline transition-colors hover:text-ink" href="https://frank-dixon.github.io/#projects">Projects</a></li>
+          <li><a class="font-mono text-[0.68rem] font-medium uppercase tracking-[0.12em] text-muted no-underline transition-colors hover:text-ink" href="https://frank-dixon.github.io/#contact">Contact</a></li>
         </ul>
       </nav>
     </div>
+    <div class="hs-rule" aria-hidden="true"></div>
   </header>
 
   <header class="site-header">
@@ -127,7 +128,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>Offline-ready shell · Last forecast cached for quiet moments.</p>
+    <p>Weather · Built by <a class="font-semibold text-teal-deep" href="https://frank-dixon.github.io/">Frank Dixon</a> · Offline-ready shell · Last forecast cached for quiet moments.</p>
     <details id="install-details" class="install-details">
       <summary>Add to Home Screen</summary>
       <div class="install-body">

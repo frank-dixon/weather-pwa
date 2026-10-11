@@ -1,5 +1,5 @@
 /* Weather PWA service worker — app shell + last forecast API cache */
-const SHELL_CACHE = "weather-pwa-shell-v5";
+const SHELL_CACHE = "weather-pwa-shell-v6";
 const DATA_CACHE = "weather-pwa-data-v5";
 
 const SHELL_ASSETS = [

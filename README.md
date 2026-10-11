@@ -52,3 +52,13 @@ All asset links use relative URLs (`./…`) so the project-pages base path works
 ## License
 
 Personal project · weather data © Open-Meteo contributors
+
+## Development
+
+```bash
+npm install
+npm run watch   # Tailwind compile + minify src/input.css -> styles.css, esbuild minify src/js -> root on save
+npm run build   # one-shot production build
+```
+
+Edit `src/`; the minified `styles.css` and JS at the repo root are what GitHub Pages serves.
